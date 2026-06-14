@@ -18,13 +18,13 @@ class user;
 extern vector<user> account;
 int search(const vector<user> &account, int target);
 void save_account(const vector<user> &account);
-int AdminID = 100000;
-string Admin_pass = "Admin123!";
+int AdminID = 10;
+string Admin_pass = "Admin!123";
 
 void sleep(int ms, string word)
 {
     std::cout << word;
-    Sleep(1000);
+    Sleep(ms);
 }
 
 void Clear_Screen()
@@ -225,14 +225,17 @@ public:
         this->status = 1;
     }
 
-    int Login(vector<user> &account, string p)
+    int Login(vector<user> &account)
     {
 
-        cout << "=====  welcome to login page  =====";
+        sleep(1000, "Loading..");
+        Clear_Screen();
+        string p;
+        cout << "\n=====  welcome to login page  =====";
         cout << "\nEnter the ID : ";
         int i;
         cin >> i;
-        cout << "enter The password : ";
+        cout << "Enter The password : ";
         p = EnterPass2();
         int c_index = search(account, i);
         return c_index;
@@ -279,25 +282,26 @@ public:
         }
     }
 
-    int signup(vector<user> &account)
+    void signup(vector<user> &account)
     {
         system("cls");
-        cout << "=====  welcome to sign up menu  =====\n";
+        cout << "=====  Welcome to sign up menu  =====\n";
         int id = Creat_ID(account);
         double b;
         string n, p;
-        cout << "enter your name : ";
+        cout << "Enter your name : ";
         cin >> n;
         cout << "Enter your password : ";
         p = EnterPass();
         cout << endl
-             << "enter started balance : ";
+             << "Enter started balance : ";
         cin >> b;
         user temp(id, n, p, b);
         account.push_back(temp);
         cout << "Account created successfully with ID: " << id << endl;
         save_account(account);
-        return id;
+        sort(account.begin(), account.end(), [](const Bank &a, const Bank &b)
+             { return a.get_id() < b.get_id(); });
     }
 
     void changeAccountStatus()
@@ -349,6 +353,7 @@ public:
         if (!t.IsActive())
         {
             cout << "\nSorry, this account is Inactive.\n";
+            cout << "Press any key to go to the main menu:";
             return false;
         }
 
@@ -359,7 +364,7 @@ public:
         {
             cout << "\nEnter The password (Tries left: " << tries << "): ";
             p = EnterPass2();
-            if (isPassTheSame(t.get_pass(), p))
+            if (isPassTheSame(t.get_pass(), code(p, t.get_id())))
             {
                 return true;
             }
@@ -378,120 +383,121 @@ public:
         return false;
     }
 
-    bool Menu(user &t)
+    void Menu(vector<user> &account, int index)
     {
         Clear_Screen();
-        bool userin = true;
         int x;
-        cout << "=========================================" << endl;
-        cout << "      Welcome " << t.get_name() << " to the menu   ====" << endl;
-        cout << "=========================================" << endl;
-        cout << "Please choose from the following options : ";
-        cout << "\n1. Deposit " << endl;
-        cout << "2. Withdraw " << endl;
-        cout << "3. Inactive Account " << endl;
-        cout << "4. Display Account info " << endl;
-        cout << "5. Logout " << endl;
-        cout << "Enter Your choice : ";
-        cin >> x;
-
-        switch (x)
+        while (true)
         {
+            user &t = account[index];
+            cout << "=========================================" << endl;
+            cout << "      Welcome " << t.get_name() << " to the menu   ====" << endl;
+            cout << "=========================================" << endl;
+            cout << "Please choose from the following options : ";
+            cout << "\n1. Deposit " << endl;
+            cout << "2. Withdraw " << endl;
+            cout << "3. Inactive Account " << endl;
+            cout << "4. Display Account info " << endl;
+            cout << "5. Logout " << endl;
+            cout << "Enter Your choice : ";
+            cin >> x;
 
-        case 1:
-        {
-            double a;
-            cout << "Enter the amount\n :";
-            cin >> a;
-            t.deposit(a);
-            save_account(account);
-            sleep(1000, "loading");
-        }
-        break;
-
-        case 2:
-        {
-            double a;
-            sleep(1000, "Loading....");
-            Clear_Screen();
-            cout << "======  Withdraw  ======\n";
-            cout << "\nEnter the amount :";
-            cin >> a;
-            if (a <= t.get_balance())
+            switch (x)
             {
-                t.withdraw(a);
-                sleep(1000, "loading...");
+
+            case 1:
+            {
+                double a;
+                cout << "Enter the amount\n :";
+                cin >> a;
+                t.deposit(a);
                 save_account(account);
+                sleep(1000, "loading");
+            }
+            break;
+
+            case 2:
+            {
+                double a;
+                sleep(1000, "Loading....");
+                Clear_Screen();
+                cout << "======  Withdraw  ======\n";
+                cout << "\nEnter the amount :";
+                cin >> a;
+                if (a <= t.get_balance())
+                {
+                    t.withdraw(a);
+                    sleep(1000, "loading...");
+                    save_account(account);
+                    break;
+                }
+                else
+                {
+                    cout << "your balance isn't enough .";
+                    cout << "press any key to go back:";
+                    _getch();
+                    sleep(500, "Loading....");
+                    Clear_Screen();
+                }
+            }
+            break;
+            case 3:
+            {
+                cout << "Enter your password to Inactive your Account: ";
+                string p = EnterPass2();
+                if (isPassTheSame(t.get_pass(), p))
+                {
+                    t.disActive();
+                    cout << "\nyour Account disActivated successfully.\n";
+                    user_ = false;
+                    sleep(1500, "Logging out...");
+                    Clear_Screen();
+                    save_account(account);
+                    break;
+                }
+                else
+                {
+                    cout << "\nWrong password. Returning to user menu.\n";
+                    sleep(1500, "Loading....");
+                    Clear_Screen();
+                }
                 break;
             }
-            else
+            break;
+            case 4:
             {
-                cout << "your balance isn't enough .";
-                cout << "press any key to go back:";
+                t.display();
+                cout << "\nPress any key to go to main menu : ";
                 _getch();
-                sleep(500, "Loading....");
-                Clear_Screen();
-            }
-        }
-        break;
-        case 3:
-        {
-            cout << "Enter your password to Inactive your Account: ";
-            string p = EnterPass2();
-            if (isPassTheSame(t.get_pass(), p))
-            {
-                t.disActive();
-                cout << "\nyour Account disActivated successfully.\n";
-                user_ = false;
-                userin = false;
-                sleep(1500, "Logging out...");
-                Clear_Screen();
-                save_account(account);
                 break;
             }
-            else
-            {
-                cout << "\nWrong password. Returning to user menu.\n";
-                sleep(1500, "Loading....");
-                Clear_Screen();
-            }
             break;
-        }
-        break;
-        case 4:
-        {
-            t.display();
-            cout << "\nPress any key to go to main menu : ";
-            _getch();
-            break;
-        }
-        break;
-        case 5:
-        {
-            cout << "Are you sure you want to logout? (y/n): ";
-            char confirm;
-            cin >> confirm;
-            if (confirm == 'y' || confirm == 'Y')
+            case 5:
             {
-                user_ = false;
-                userin = false;
-                cout << "Logging out...";
-                Sleep(1500);
-                Clear_Screen();
+                cout << "Are you sure you want to logout? (y/n): ";
+                char confirm;
+                cin >> confirm;
+                if (confirm == 'y' || confirm == 'Y')
+                {
+                    user_ = false;
+                    cout << "Logging out...";
+                    Sleep(1500);
+                    Clear_Screen();
+                    return;
+                }
+                else
+                {
+                    cout << "Logout cancelled. Returning to user menu.\n";
+                    cout << "Loading....";
+                    sleep(1500, "Loading....");
+                    Clear_Screen();
+                }
             }
-            else
-            {
-                cout << "Logout cancelled. Returning to user menu.\n";
-                cout << "Loading....";
-                sleep(1500, "Loading....");
-                Clear_Screen();
+            default:
+                cout << "invalid input";
+                break;
             }
         }
-        default:
-            cout << "invalid input";
-            break;
-        }
-        return userin;
     }
 };
 void save_account(const vector<user> &account);
@@ -592,20 +598,26 @@ public:
         }
         else
         {
+            cout << "\nWrong data!";
+            cout << endl
+                 << "Press any key to go to the main menu:";
+            _getch();
             return false;
         }
     }
 
-    bool Menu()
+    void Menu()
     {
-        bool in = true;
+        if (!islogin)
+            return;
+
         Sleep(1000);
         system("cls");
-        if (islogin)
+
+        while (true)
         {
-
+            Clear_Screen();
             int x;
-
             cout << "===================================" << endl;
             cout << "=====  welcome to Admin menu  =====" << endl;
             cout << "===================================" << endl
@@ -617,149 +629,126 @@ public:
             cout << "4. Exit " << endl;
             cout << "Enter Your choice : ";
             cin >> x;
-            cout << "\nlogin in....";
-            Sleep(1000);
-            while (in)
+            sleep(1000, "Loading..");
+
+            switch (x)
             {
-                switch (x)
+            case 1:
+            {
+                display(account);
+                cout << endl;
+                cout << "press any key to go back : ";
+                _getch();
+                break;
+            }
+
+            case 2:
+            {
+                int D;
+                cout << "\nLoading....";
+                Sleep(750);
+                Clear_Screen();
+                cout << "=====  Search For Account  =====\n";
+                cout << "Enter the ID : ";
+                cin >> D;
+                cout << "\nSearching....";
+                Sleep(1000);
+                sort(account.begin(), account.end(), [](const user &a, const user &b)
+                     { return a.get_id() < b.get_id(); });
+                int index = search(account, D);
+                if (index == -1)
                 {
-                case 1:
-                {
-                    display(account);
-                    cout << endl;
-                    cout << "press any key exit : ";
+                    cout << "this account doesn't found in the system ";
+                    cout << endl
+                         << "press any key to go back : ";
                     _getch();
-                    return true;
                     break;
                 }
-                break;
-
-                case 2:
+                user &b = account[index];
+                Clear_Screen();
+                b.display();
+                cout << "press * to change this Account status to " << (b.IsActive() ? "(InActive)" : "(Active)") << " or any other key to exit :";
+                char x_choice;
+                cin >> x_choice;
+                cin.ignore();
+                if (x_choice == '*')
                 {
-                    int D;
-                    cout << "\nLoading....";
-                    Sleep(750);
-                    Clear_Screen();
-                    cout << "=====  Search For Account  =====\n";
-                    cout << "Enter the ID : ";
-                    cin >> D;
-                    cout << "\nSearching....";
-                    Sleep(1000);
-                    sort(account.begin(), account.end(), [](const user &a, const user &b)
-                         { return a.get_id() < b.get_id(); });
-                    int index = search(account, D);
-                    if (index == -1)
+                    cout << "Are you sure you want to do this process ? [y/n] : ";
+                    char y;
+                    cin >> y;
+                    if (y == 'y' || y == 'Y')
                     {
-                        cout << "this account doesn't found in the system ";
-                        cout << endl
-                             << "press any key to exit : ";
+                        b.disActive();
+                        cout << "done " << (b.IsActive() ? "(unActivated)" : "(Activated)") << " account " << endl;
+                        save_account(account);
+                        cout << "press any key to go back :";
                         _getch();
-                        return true;
-                        continue;
+                        cout << "\nLoading....";
+                        Sleep(1500);
                     }
+                }
+                else
+                {
+                    cout << "invalid input press any key to go back : ";
+                    _getch();
+                }
+                break;
+            }
+
+            case 3:
+            {
+                cout << "\nLoading....";
+                Sleep(1500);
+                Clear_Screen();
+                cout << "Enter the ID of the account : ";
+                int h;
+                cin >> h;
+                int index = search(account, h);
+                if (index != -1)
+                {
                     user &b = account[index];
-                    Clear_Screen();
-                    b.display();
-                    cout << "press * to change this Account status to " << (b.IsActive() ? "(InActive)" : "(Active)") << " or any other key to exit :";
-                    char x;
-                    cin >> x;
-                    cin.ignore();
-                    if (x == '*')
+                    cout << "Are you sure you want to " << (b.IsActive() ? "unActive" : "Active") << "? [y/n] : ";
+                    char y;
+                    cin >> y;
+                    if (y == 'y' || y == 'Y')
                     {
-                        cout << "Are you sure you want to do this process ? [y/n] : ";
-                        char y;
-                        cin >> y;
-                        if (y == 'y' || y == 'Y')
-                        {
-                            b.disActive();
-                            cout << "done " << (b.IsActive() ? "(unActivated)" : "(Activated)") << " account " << endl;
-                            cout << "press any key to exit :";
-                            _getch();
-                            cout << "\nLoading....";
-                            Sleep(1500);
-                            return true;
-                        }
+                        b.disActive();
+                        cout << "done " << (b.IsActive() ? "(Activated)" : "(unActivated)") << " account " << endl;
+                        save_account(account);
+                        cout << "press any key to go back :";
+                        _getch();
+                        Sleep(1000);
                     }
                     else
                     {
-                        cout << "invalid input press any key to go back : ";
+                        cout << "\ninvalid input press any key to go back : ";
                         _getch();
-                        return true;
                     }
                 }
+                else
+                {
+                    cout << "this account not found in the system";
+                    cout << "\npress any key to go back";
+                    _getch();
+                    Sleep(750);
+                }
                 break;
+            }
 
-                case 3:
-                {
-                    cout << "\nLoading....";
-                    Sleep(1500);
-                    Clear_Screen();
-                    cout << "Enter the ID of the account : ";
-                    int h;
-                    cin >> h;
-                    int index = search(account, h);
-                    if (index != -1)
-                    {
-                        user &b = account[index];
-                        cout << "Are you sure you want to " << (b.IsActive() ? "unActive" : "Active") << "? [y/n] : ";
-                        char y;
-                        cin >> y;
-                        if (y == 'y' || y == 'Y')
-                        {
-                            b.disActive();
-                            cout << "done " << (b.IsActive() ? "(Activated)" : "(unActivated)") << " account " << endl;
-                            save_account(account);
-                            cout << "press any key to exit :";
-                            _getch();
-                            Sleep(1000);
-                            return true;
-                            continue;
-                        }
-                        else
-                        {
-                            cout << "\ninvalid input press any key to go back : ";
-                            _getch();
-                            return true;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        cout << "this account not found in the system";
-                        cout << "\npress any key to go back";
-                        _getch();
-                        Sleep(750);
-                        return true;
-                        continue;
-                    }
-                }
+            case 4:
+            {
+                cout << "\nExiting Admin Menu....";
+                Sleep(1000);
+                Clear_Screen();
+                return;
+            }
+
+            default:
+                cout << "\ninvalid input. Press any key to try again.";
+                _getch();
                 break;
-                case 4:
-                {
-                    cout << "\nExiting....";
-                    Sleep(1000);
-                    Clear_Screen();
-                    in = false;
-                    return false;
-                }
-                default:
-                    cout << "\ninvalid input ";
-                    return false;
-                    break;
-                }
             }
         }
-        else
-        {
-            cout << "\nWrong data !" << endl;
-            cout << "Press Any key to go to the main menu : ";
-            _getch();
-            Sleep(1000);
-            Clear_Screen();
-            in = false;
-        }
-
-        return in;
     }
 };
 
@@ -771,13 +760,78 @@ int mainMenu()
     cout << "=====   Welcome to main menu   ====" << endl;
     cout << "===================================" << endl;
     cout << "Please choose from the following options : " << endl;
-    cout << "1. Login " << endl;
-    cout << "2. sign up " << endl;
+    cout << "1. Sign up " << endl;
+    cout << "2. Login " << endl;
     cout << "3. Login As Admin " << endl;
     cout << "4. Exit " << endl;
     cout << "Enter Your choice : ";
     cin >> x;
     return x;
+}
+
+void run_the_wallet()
+{
+    bool running = true;
+    Clear_Screen();
+    while (running)
+    {
+        int choice = mainMenu();
+
+        switch (choice)
+        {
+        case 1:
+        {
+            sleep(750, "Loading....");
+            user temp;
+            temp.signup(account);
+            cout << "Press any key to go to the main menu: ";
+            _getch();
+            break;
+        }
+        case 2: // User Login
+        {
+            sleep(750, "Loading....");
+            user temp;
+            int index = temp.Login(account);
+            bool is_user = temp.logedin(account, index);
+            if (is_user)
+            {
+                temp.Menu(account, index);
+            }
+            else
+            {
+                _getch();
+            }
+            break;
+        }
+        case 3:
+        {
+            sleep(750, "Loading....");
+            Admin admin_obj(AdminID, "Admin", Admin_pass);
+            if (admin_obj.Login(AdminID, Admin_pass))
+            {
+                admin_obj.Menu();
+            }
+            break;
+        }
+        case 4:
+        {
+            Clear_Screen();
+            cout << "Saving database... Goodbye!\n";
+            save_account(account);
+            Sleep(1000);
+            running = false;
+            break;
+        }
+        default:
+        {
+            cout << "\n Invalid input.";
+            cout << "\n Press any key to try again :";
+            _getch();
+            break;
+        }
+        }
+    }
 }
 
 int main()
@@ -786,100 +840,10 @@ int main()
     load_account(account);
     sort(account.begin(), account.end(), [](const Bank &a, const Bank &b)
          { return a.get_id() < b.get_id(); }); // sort the account vector to be ready for binary search
-    while (true)
-    {
-        int choice = mainMenu();
-
-        if (choice == 4) // exit
-        {
-            save_account(account);
-            Sleep(2000);
-            return 0;
-        }
-        cout << "\nLoading....";
-        Sleep(2000);
-        switch (choice)
-        {
-        case 1: // login
-        {
-            Clear_Screen(); // clear the screen before login page
-            user u;
-            int index = u.Login(account, u.get_pass());
-            if (u.logedin(account, index))
-            {
-                user &t = account[index];
-                while (t.user_) // while the user is logged in
-                {
-                    bool in = t.Menu(t);
-                    if (!in)
-                    {
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                cout << endl
-                     << "Press Any key to go to the main menu : ";
-                _getch();
-                sleep(1000, "");
-                continue;
-            }
-        }
-        break;
-        case 2: // sign up
-        {
-
-            Clear_Screen(); // clear the screen before sign up page
-            user temp;
-            temp.signup(account);
-            save_account(account);
-            cout << "\nPress any key to go to the main menu : ";
-            _getch();
-            Clear_Screen();
-        }
-        break;
-
-        case 3: // login as admin
-        {
-            Clear_Screen(); // clear the screen before admin login page
-            Admin admin(AdminID, "Admin", Admin_pass);
-            bool enter = admin.Login(AdminID, Admin_pass);
-            if (enter)
-            {
-                while (true)
-                {
-                    bool intheapp = admin.Menu();
-                    if (!intheapp)
-                    {
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                cout << "\nWrong data !" << endl;
-                cout << "Press Any key to go to the main menu : ";
-                _getch();
-                Sleep(1000);
-                Clear_Screen();
-            }
-        }
-        break;
-        default:
-            cout << "\nInvalid Input .";
-            cout << "\nEnter Any key to try again : ";
-            _getch();
-            cout << "\nLoading....";
-            Sleep(1500);
-            Clear_Screen();
-            break;
-        }
-    }
-
+    run_the_wallet();
     // TODO : create a function that changes the password of the account and add it to the user menu
-    // TODO : Add a transfer money from one account to another account function and add it to the user menu and notfication to the user when he receive money in his account
-
+    // TODO : Add a transfer money from one account to another account function and add it to the user menu and notification to the user when he receive money in his account
+    // ! do check in the cipher fun of the ',' and make it '_'
     return 0;
 }
 
