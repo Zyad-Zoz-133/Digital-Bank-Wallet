@@ -46,7 +46,11 @@ string code(string t, int id)
     for (int i = 0; i < int(t.length()); i++)
     {
         unsigned char c = t[i];
-        res += char((c + shift) % 256);
+        char coded = ((c + shift) % 256);
+        if (coded == ',')
+            res += char(coded + 1);
+        else
+            res += coded;
     }
     return res;
 }
@@ -839,11 +843,10 @@ int main()
     srand(time(0));
     load_account(account);
     sort(account.begin(), account.end(), [](const Bank &a, const Bank &b)
-         { return a.get_id() < b.get_id(); }); // sort the account vector to be ready for binary search
+         { return a.get_id() < b.get_id(); });
     run_the_wallet();
     // TODO : create a function that changes the password of the account and add it to the user menu
     // TODO : Add a transfer money from one account to another account function and add it to the user menu and notification to the user when he receive money in his account
-    // ! do check in the cipher fun of the ',' and make it '_'
     return 0;
 }
 
