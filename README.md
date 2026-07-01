@@ -22,22 +22,22 @@ To log in and evaluate the administrative functions, use the following pre-confi
 
 ---
 
-## **How to Use the Program**
-
-1. **Sign Up:** Create a new profile by providing a unique name, strong password, and an initialization balance. The system automatically provisions a unique 5-digit ID.
-2. **User Login:** Access the secure operations menu using your unique ID and password.
-3. **Wallet Navigation:** Execute operations such as checking balances, depositing funds, withdrawing cash safely, changing passwords, or deactivating accounts.
-4. **Admin Dashboard:** Access structural overviews to check total system balances, lookup specific profiles, or toggle global account activation flags.
-
----
----
-
 ## **🛠️ Development Tools**
 
 This project was built and managed using the following industry-standard tools:
 * **VS Code:** The primary text editor used for writing, formatting, and debugging the C++ code.
 * **Git:** Used for local version control to track changes and manage code history.
 * **GitHub:** Used for hosting the repository online, managing backup history, and deploying the live site via GitHub Pages.
+
+---
+
+
+## **How to Use the Program**
+
+1. **Sign Up:** Create a new profile by providing a unique name, strong password, and an initialization balance. The system automatically provisions a unique 5-digit ID.
+2. **User Login:** Access the secure operations menu using your unique ID and password.
+3. **Wallet Navigation:** Execute operations such as checking balances, depositing funds, withdrawing cash safely, changing passwords, or deactivating accounts.
+4. **Admin Dashboard:** Access structural overviews to check total system balances, lookup specific profiles, or toggle global account activation flags.
 
 ---
 
